@@ -1,5 +1,5 @@
 import time
-from neopixel import PixelStrip, Color
+from rpi_ws281x import PixelStrip, Color
 import argparse
 import random
 import requests
