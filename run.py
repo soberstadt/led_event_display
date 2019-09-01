@@ -1,7 +1,8 @@
 import time
-from rpi_ws281x import PixelStrip, Color
+from neopixel import PixelStrip, Color
 import argparse
 import random
+import requests
 
 # LED strip configuration:
 LED_COUNT = 300       # Number of LED pixels.
@@ -34,6 +35,8 @@ def sync_data():
     next_color = Color(random.randint(0,255),
                        random.randint(0,255),
                        random.randint(0,255))
+
+    request.get('example.com')
 
 def wait():
     current = int(round(time.time() * 1000))
