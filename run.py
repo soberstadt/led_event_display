@@ -14,21 +14,26 @@ LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False    # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
+TIME_INTERVAL = 5000
+
 start = int(round(time.time() * 1000))
 
 next_color = Color(255, 0, 0)
 
 def push_pixels(strip):
-    for i in range(strip.numPixels()):
+    for i in reversed(range(strip.numPixels())):
         if i > 0:
-            prev_color = strip.getPixelColor(i)
+            prev_color = strip.getPixelColor(i - 1)
             strip.setPixelColor(i, prev_color)
             strip.setPixelColor(i - 1, Color(0, 0, 0))
+    strip.show()
 
 def add_pixel(strip):
+    global next_color
     if next_color != None:
         strip.setPixelColor(0, next_color)
         next_color = None
+        strip.show()
 
 def sync_data():
     global next_color
@@ -36,12 +41,12 @@ def sync_data():
                        random.randint(0,255),
                        random.randint(0,255))
 
-    request.get('example.com')
+    # requests.get('example.com')
 
 def wait():
     current = int(round(time.time() * 1000))
     age = current - start
-    needed_rest = age % 1000
+    needed_rest = age % TIME_INTERVAL
     time.sleep(needed_rest / 1000.0)
 
 def parse_args():
