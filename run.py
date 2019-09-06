@@ -49,7 +49,7 @@ def push_pixels(strip):
         if app_id != None:
             print('making pixel red: %i', i)
             color = Color(255, 0, 0)
-            strip.setPixelColor(i, color)
+        strip.setPixelColor(i, color)
 
     strip.show()
 
