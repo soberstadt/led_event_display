@@ -4,6 +4,9 @@ from rpi_ws281x import PixelStrip, Color
 import argparse
 import random
 import requests
+import json
+import datetime
+import dateutil.parser
 
 # LED strip configuration:
 # Number of LED pixels.
@@ -27,13 +30,27 @@ RANDOM_PIXEL_DELAY = int(os.environ.get('RANDOM_PIXEL_DELAY') or 10)
 start = int(round(time.time() * 1000))
 
 next_color = Color(255, 0, 0)
+events = {}
 
 def push_pixels(strip):
-    for i in reversed(range(strip.numPixels())):
-        if i > 0:
-            prev_color = strip.getPixelColor(i - 1)
-            strip.setPixelColor(i, prev_color)
-            strip.setPixelColor(i - 1, Color(0, 0, 0))
+    tick = TIME_INTERVAL / 1000
+    now = int(datetime.datetime.utcnow().strftime("%s"))
+
+    for i in range(LED_COUNT):
+        lower = now - (tick * (i + 1))
+        higher = now - (tick * i)
+        app_id = None
+        for date, app in events.items():
+            if (date < higher) and (date > lower):
+                print('found %s', app)
+                app_id = app
+                break
+        color = 0
+        if app_id != None:
+            print('making pixel red: %i', i)
+            color = Color(255, 0, 0)
+            strip.setPixelColor(i, color)
+
     strip.show()
 
 def add_pixel(strip):
@@ -43,14 +60,42 @@ def add_pixel(strip):
         next_color = None
         strip.show()
 
-def sync_data():
-    global next_color
-    if random.randint(0, RANDOM_PIXEL_DELAY) == 0:
-        next_color = Color(random.randint(0,255),
-                           random.randint(0,255),
-                           random.randint(0,255))
+def get_es_data():
+    auth_token = os.environ.get('AUTH_TOKEN')
+    url = 'https://org-cru-prod1.elasticsearch.snplow.net/_plugin/kibana/api/console/proxy?path=_search&method=POST'
+    headers = { 'kbn-version': '6.5.4', 'authorization': 'Basic ' + auth_token, 'content-type': 'application/json' }
+    payload = {
+        "_source": ["collector_tstamp","app_id"],
+        "query": {
+            "bool": {
+            "must": [
+                {
+                "match_phrase": {
+                    "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": {
+                    "query": "https://www.everystudent.com/features/followup.html"
+                    }
+                }
+                },
+                {
+                "range": {
+                    "collector_tstamp": { "gte" : "now-4h" }
+                }
+                }
+            ]
+            }
+        }
+    }
+    r = requests.post(url, headers=headers, data=json.dumps(payload))
+    return r.json()
 
-    # requests.get('http://example.com')
+def sync_data():
+    global events
+    data = {}
+    for hit in get_es_data()['hits']['hits']:
+        time = hit['_source']['collector_tstamp']
+        seconds = int(dateutil.parser.parse(time).strftime("%s"))
+        data[seconds] = hit['_source']['app_id']
+    events = data
 
 def wait():
     current = int(round(time.time() * 1000))
@@ -85,9 +130,9 @@ if __name__ == '__main__':
 
     try:
         while True:
-            push_pixels(strip)
             sync_data()
-            add_pixel(strip)
+            push_pixels(strip)
+            # add_pixel(strip)
             wait()
 
     except KeyboardInterrupt:
