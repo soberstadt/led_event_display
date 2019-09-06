@@ -22,6 +22,7 @@ LED_INVERT = False
 LED_CHANNEL = 0
 
 TIME_INTERVAL = int(os.environ.get('TIME_INTERVAL') or 5000)
+RANDOM_PIXEL_DELAY = int(os.environ.get('RANDOM_PIXEL_DELAY') or 10)
 
 start = int(round(time.time() * 1000))
 
@@ -44,11 +45,12 @@ def add_pixel(strip):
 
 def sync_data():
     global next_color
-    next_color = Color(random.randint(0,255),
-                       random.randint(0,255),
-                       random.randint(0,255))
+    if random.randint(0, RANDOM_PIXEL_DELAY) == 0:
+        next_color = Color(random.randint(0,255),
+                           random.randint(0,255),
+                           random.randint(0,255))
 
-    # requests.get('example.com')
+    # requests.get('http://example.com')
 
 def wait():
     current = int(round(time.time() * 1000))
