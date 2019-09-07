@@ -65,23 +65,68 @@ def get_es_data():
     url = 'https://org-cru-prod1.elasticsearch.snplow.net/_plugin/kibana/api/console/proxy?path=_search&method=POST'
     headers = { 'kbn-version': '6.5.4', 'authorization': 'Basic ' + auth_token, 'content-type': 'application/json' }
     payload = {
-        "_source": ["collector_tstamp","app_id"],
+        "size" : 300,
+        "_source": ["collector_tstamp", "app_id", "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl"],
         "query": {
             "bool": {
-            "must": [
-                {
-                "match_phrase": {
-                    "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": {
-                    "query": "https://www.everystudent.com/features/followup.html"
+                "should": [
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.everystudent.com/features/followup.html"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.cadaestudiante.com/articulos/conociendo2.html"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.suaescolha.com/pessoalmente2/"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.kampusweb.com/konular/kabul.html"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.mahasiswakeren.com/artikel/402mengenal.html"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.kazdystudent.pl/a/nowezycie.html"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.everyarabstudent.com/a/fol.html"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.everystudent.ro/a/interesa.html"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.everystudent.hu/a/hogyantovabb.html"
+                        }
+                    },
+                    {
+                        "term": {
+                            "unstruct_event_com_snowplowanalytics_snowplow_link_click_1.targetUrl": "https://www.mirstudentov.com/a/fol.html"
+                        }
+                    }
+                ],
+                "minimum_should_match" : 1,
+                "must": {
+                    "range": {
+                        "collector_tstamp": { "gte" : "now-4h" }
                     }
                 }
-                },
-                {
-                "range": {
-                    "collector_tstamp": { "gte" : "now-4h" }
-                }
-                }
-            ]
             }
         }
     }
