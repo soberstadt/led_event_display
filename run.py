@@ -92,7 +92,6 @@ def push_pixels(strip):
         app_id = None
         for date, app in events.items():
             if (date < higher) and (date >= lower):
-                print('found %s', app)
                 app_id = app
                 break
         strip.setPixelColor(i, color_for(app_id))
@@ -121,12 +120,14 @@ def sync_data():
         seconds = int(dateutil.parser.parse(time).strftime("%s"))
         data[seconds] = hit['_source']['app_id']
     events = data
+    print('data fetched')
 
 def wait():
     current = int(round(time.time() * 1000))
     age = current - start
     needed_rest = age % TIME_INTERVAL
-    time.sleep(needed_rest / 1000.0)
+    if needed_rest > 1:
+        time.sleep(needed_rest / 1000.0)
 
 def parse_args():
     parser = argparse.ArgumentParser()
