@@ -7,6 +7,7 @@ import requests
 import json
 import datetime
 import dateutil.parser
+import traceback
 
 # LED strip configuration:
 # Number of LED pixels.
@@ -163,3 +164,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         if args.clear:
             clear(strip)
+
+    except Exception as exc:
+        print(traceback.format_exc())
+        print(exc)
