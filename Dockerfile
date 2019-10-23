@@ -4,8 +4,7 @@ WORKDIR /usr/src/app
 
 ENV INITSYSTEM on
 
-RUN apt-get update
-RUN apt-get install -y gcc make build-essential supervisor
+RUN install_packages gcc make build-essential supervisor
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
