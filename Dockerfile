@@ -5,11 +5,11 @@ WORKDIR /usr/src/app
 ENV INITSYSTEM on
 
 RUN apt-get update
-RUN apt-get install gcc make build-essential
+RUN apt-get install -y gcc make build-essential supervisor
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /usr/src/app
 
-CMD ["python", "run.py"]
+CMD ["supervisord", "-n", "-c", "./supervisord.conf"]
