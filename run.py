@@ -49,7 +49,7 @@ color_map = {
 es_prc_links = [
     "https://www.everystudent.com/features/followup.html",
     "https://www.cadaestudiante.com/articulos/conociendo2.html",
-    "https://www.suaescolha.com/pessoalmente2/",
+    "https://www.suaescolha.com/a/pessoalmente2.html",
     "https://www.kampusweb.com/konular/kabul.html",
     "https://www.mahasiswakeren.com/artikel/402mengenal.html",
     "https://www.kazdystudent.pl/a/nowezycie.html",
